@@ -35,9 +35,7 @@ local function treasure_chest(position)
 	table.insert(treasure_chest_loot_weights, {{name = 'pipe', count = math.random(10,100)},6})		
 	table.insert(treasure_chest_loot_weights, {{name = 'wooden-chest', count = 1},1})
 	table.insert(treasure_chest_loot_weights, {{name = 'burner-mining-drill', count = 1},1})
-	table.insert(treasure_chest_loot_weights, {{name = 'iron-axe', count = 1},1})
-	table.insert(treasure_chest_loot_weights, {{name = 'steel-axe', count = 1},3})
-	table.insert(treasure_chest_loot_weights, {{name = 'raw-wood', count = math.random(5,50)},2})
+	table.insert(treasure_chest_loot_weights, {{name = 'wood', count = math.random(5,50)},2})
 	table.insert(treasure_chest_loot_weights, {{name = 'sulfur', count = math.random(20,50)},7})
 	table.insert(treasure_chest_loot_weights, {{name = 'explosives', count = math.random(20,50)},6})
 	table.insert(treasure_chest_loot_weights, {{name = 'shotgun', count = 1},2})
@@ -360,8 +358,7 @@ local function on_player_joined_game(event)
 	if player.online_time < 10 then		
 		player.insert {name = 'submachine-gun', count = 1}
 		player.insert {name = 'raw-fish', count = 12}		
-		player.insert {name = 'firearm-magazine', count = 32}			
-		player.insert {name = 'steel-axe', count = 1}	
+		player.insert {name = 'firearm-magazine', count = 32}		
 		player.insert {name = 'light-armor', count = 1}
 	end	
 end

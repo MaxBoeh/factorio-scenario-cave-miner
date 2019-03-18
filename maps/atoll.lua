@@ -53,10 +53,6 @@ local function on_player_joined_game(event)
 			player.teleport({0,0}, "atoll")
 		end
 	end
-	
-	if player.online_time < 4 then		
-		player.insert {name = 'iron-axe', count = 1}
-	end	
 end
 
 local function on_marked_for_deconstruction(event)

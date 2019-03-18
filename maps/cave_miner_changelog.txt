@@ -1,3 +1,7 @@
+0.22 (not released yet)
+migrated to factorio version 0.17
+adjusted amount of trees and made them configurable using the map_gen_settings "size"
+
 0.21
 Ore bonus yield limited at the maximum biter difficulty.
 

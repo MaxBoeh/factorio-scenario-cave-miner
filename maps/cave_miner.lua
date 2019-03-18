@@ -106,7 +106,7 @@ end
 		
 local function create_cave_miner_button(player)		
 	if player.gui.top["caver_miner_stats_toggle_button"] then player.gui.top["caver_miner_stats_toggle_button"].destroy() end	
-	local b = player.gui.top.add({ type = "sprite-button", name = "caver_miner_stats_toggle_button", sprite = "item/iron-axe" })
+	local b = player.gui.top.add({ type = "sprite-button", name = "caver_miner_stats_toggle_button", sprite = "item/iron-ore" })
 	b.style.minimal_height = 38
 	b.style.minimal_width = 38
 	b.style.top_padding = 2
@@ -237,7 +237,6 @@ local function treasure_chest(position, distance_to_center)
 	local math_random = math.random
 	local chest_raffle = {}
 	local chest_loot = {			
-		{{name = "steel-axe", count = math_random(1,3)}, weight = 2, evolution_min = 0.0, evolution_max = 0.5},
 		{{name = "submachine-gun", count = math_random(1,3)}, weight = 3, evolution_min = 0.0, evolution_max = 0.1},
 		{{name = "coin", count = math_random(1,3)}, weight = 3, evolution_min = 0.0, evolution_max = 0.1},		
 		{{name = "slowdown-capsule", count = math_random(16,32)}, weight = 1, evolution_min = 0.3, evolution_max = 0.7},
@@ -443,37 +442,37 @@ end
 
 local function secret_shop(pos)
 	local secret_market_items = {		
-    {price = {{"coin", math.random(250,450)}}, offer = {type = 'give-item', item = 'combat-shotgun'}},
-    {price = {{"coin", math.random(250,450)}}, offer = {type = 'give-item', item = 'flamethrower'}},
-    {price = {{"coin", math.random(75,125)}}, offer = {type = 'give-item', item = 'rocket-launcher'}},
-    {price = {{"coin", math.random(2,4)}}, offer = {type = 'give-item', item = 'piercing-rounds-magazine'}},
-    {price = {{"coin", math.random(8,16)}}, offer = {type = 'give-item', item = 'uranium-rounds-magazine'}},  
-    {price = {{"coin", math.random(8,16)}}, offer = {type = 'give-item', item = 'piercing-shotgun-shell'}},
-    {price = {{"coin", math.random(6,12)}}, offer = {type = 'give-item', item = 'flamethrower-ammo'}},
-    {price = {{"coin", math.random(8,16)}}, offer = {type = 'give-item', item = 'rocket'}},
-    {price = {{"coin", math.random(10,20)}}, offer = {type = 'give-item', item = 'explosive-rocket'}},        
-    {price = {{"coin", math.random(15,30)}}, offer = {type = 'give-item', item = 'explosive-cannon-shell'}},
-    {price = {{"coin", math.random(25,35)}}, offer = {type = 'give-item', item = 'explosive-uranium-cannon-shell'}},   
-    {price = {{"coin", math.random(20,40)}}, offer = {type = 'give-item', item = 'cluster-grenade'}}, 
-	{price = {{"coin", math.random(1,3)}}, offer = {type = 'give-item', item = 'land-mine'}},	
-    {price = {{"coin", math.random(250,500)}}, offer = {type = 'give-item', item = 'modular-armor'}},
-    {price = {{"coin", math.random(1500,3000)}}, offer = {type = 'give-item', item = 'power-armor'}},
-	{price = {{"coin", math.random(15000,20000)}}, offer = {type = 'give-item', item = 'power-armor-mk2'}},
-    {price = {{"coin", math.random(4000,7000)}}, offer = {type = 'give-item', item = 'fusion-reactor-equipment'}},
-    {price = {{"coin", math.random(50,100)}}, offer = {type = 'give-item', item = 'battery-equipment'}},
-    {price = {{"coin", math.random(700,1100)}}, offer = {type = 'give-item', item = 'battery-mk2-equipment'}},
-    {price = {{"coin", math.random(400,700)}}, offer = {type = 'give-item', item = 'belt-immunity-equipment'}},
-    {price = {{"coin", math.random(12000,16000)}}, offer = {type = 'give-item', item = 'night-vision-equipment'}},
-    {price = {{"coin", math.random(300,500)}}, offer = {type = 'give-item', item = 'exoskeleton-equipment'}},
-    {price = {{"coin", math.random(350,500)}}, offer = {type = 'give-item', item = 'personal-roboport-equipment'}},
-    {price = {{"coin", math.random(25,50)}}, offer = {type = 'give-item', item = 'construction-robot'}},
-    {price = {{"coin", math.random(250,450)}}, offer = {type = 'give-item', item = 'energy-shield-equipment'}},
-    {price = {{"coin", math.random(350,550)}}, offer = {type = 'give-item', item = 'personal-laser-defense-equipment'}},    
-    {price = {{"coin", math.random(125,250)}}, offer = {type = 'give-item', item = 'railgun'}},
-    {price = {{"coin", math.random(2,4)}}, offer = {type = 'give-item', item = 'railgun-dart'}},
-	{price = {{"coin", math.random(100,175)}}, offer = {type = 'give-item', item = 'loader'}},
-	{price = {{"coin", math.random(200,350)}}, offer = {type = 'give-item', item = 'fast-loader'}},
-	{price = {{"coin", math.random(400,600)}}, offer = {type = 'give-item', item = 'express-loader'}}
+		{price = {{"coin", math.random(250,450)}}, offer = {type = 'give-item', item = 'combat-shotgun'}},
+		{price = {{"coin", math.random(250,450)}}, offer = {type = 'give-item', item = 'flamethrower'}},
+		{price = {{"coin", math.random(75,125)}}, offer = {type = 'give-item', item = 'rocket-launcher'}},
+		{price = {{"coin", math.random(2,4)}}, offer = {type = 'give-item', item = 'piercing-rounds-magazine'}},
+		{price = {{"coin", math.random(8,16)}}, offer = {type = 'give-item', item = 'uranium-rounds-magazine'}},  
+		{price = {{"coin", math.random(8,16)}}, offer = {type = 'give-item', item = 'piercing-shotgun-shell'}},
+		{price = {{"coin", math.random(6,12)}}, offer = {type = 'give-item', item = 'flamethrower-ammo'}},
+		{price = {{"coin", math.random(8,16)}}, offer = {type = 'give-item', item = 'rocket'}},
+		{price = {{"coin", math.random(10,20)}}, offer = {type = 'give-item', item = 'explosive-rocket'}},        
+		{price = {{"coin", math.random(15,30)}}, offer = {type = 'give-item', item = 'explosive-cannon-shell'}},
+		{price = {{"coin", math.random(25,35)}}, offer = {type = 'give-item', item = 'explosive-uranium-cannon-shell'}},   
+		{price = {{"coin", math.random(20,40)}}, offer = {type = 'give-item', item = 'cluster-grenade'}}, 
+		{price = {{"coin", math.random(1,3)}}, offer = {type = 'give-item', item = 'land-mine'}},	
+		{price = {{"coin", math.random(250,500)}}, offer = {type = 'give-item', item = 'modular-armor'}},
+		{price = {{"coin", math.random(1500,3000)}}, offer = {type = 'give-item', item = 'power-armor'}},
+		{price = {{"coin", math.random(15000,20000)}}, offer = {type = 'give-item', item = 'power-armor-mk2'}},
+		{price = {{"coin", math.random(4000,7000)}}, offer = {type = 'give-item', item = 'fusion-reactor-equipment'}},
+		{price = {{"coin", math.random(50,100)}}, offer = {type = 'give-item', item = 'battery-equipment'}},
+		{price = {{"coin", math.random(700,1100)}}, offer = {type = 'give-item', item = 'battery-mk2-equipment'}},
+		{price = {{"coin", math.random(400,700)}}, offer = {type = 'give-item', item = 'belt-immunity-equipment'}},
+		{price = {{"coin", math.random(12000,16000)}}, offer = {type = 'give-item', item = 'night-vision-equipment'}},
+		{price = {{"coin", math.random(300,500)}}, offer = {type = 'give-item', item = 'exoskeleton-equipment'}},
+		{price = {{"coin", math.random(350,500)}}, offer = {type = 'give-item', item = 'personal-roboport-equipment'}},
+		{price = {{"coin", math.random(25,50)}}, offer = {type = 'give-item', item = 'construction-robot'}},
+		{price = {{"coin", math.random(250,450)}}, offer = {type = 'give-item', item = 'energy-shield-equipment'}},
+		{price = {{"coin", math.random(350,550)}}, offer = {type = 'give-item', item = 'personal-laser-defense-equipment'}},    
+		{price = {{"coin", math.random(125,250)}}, offer = {type = 'give-item', item = 'railgun'}},
+		{price = {{"coin", math.random(2,4)}}, offer = {type = 'give-item', item = 'railgun-dart'}},
+		{price = {{"coin", math.random(100,175)}}, offer = {type = 'give-item', item = 'loader'}},
+		{price = {{"coin", math.random(200,350)}}, offer = {type = 'give-item', item = 'fast-loader'}},
+		{price = {{"coin", math.random(400,600)}}, offer = {type = 'give-item', item = 'express-loader'}}
 	}
 	secret_market_items = shuffle(secret_market_items)
 	
@@ -520,6 +519,9 @@ local function on_chunk_generated(event)
 	local m1 = 0.13
 	local m2 = 0.13    --10
 	local m3 = 0.10    --07
+	
+	local tree_size = game.surfaces[1].map_gen_settings.autoplace_controls.trees.size -- value 0 - 6
+	local tree_threshold = (1 - (tree_size / 6)) * 0.5
 	
 	for x = 0, 31, 1 do
 		for y = 0, 31, 1 do			
@@ -663,10 +665,11 @@ local function on_chunk_generated(event)
 					table.insert(fish_positions, {pos_x,pos_y})
 				else
 					tile_to_insert = "grass-1"
-					if cave_noise_3 > 0 and tile_distance_to_center + 3000 < global.spawn_dome_size then
+					
+					if cave_noise_3 > tree_threshold and tile_distance_to_center + 3000 < global.spawn_dome_size then
 						table.insert(spawn_tree_positions, {pos_x,pos_y})
 					end
-				end				
+				end
 			end
 			
 			if tile_distance_to_center < global.spawn_dome_size and tile_distance_to_center > global.spawn_dome_size - 500 and tile_to_insert == "grass-1" then
@@ -855,7 +858,7 @@ As you dig, you will encounter black bedrock that is just too solid for your pic
 Some explosives could even break through the impassable dark rock.
 All they need is a container and a well aimed shot.
 
-Darkness is a hazard in the mines, stay near your lamps..
+Darkness is a hazard in the mines, stay near your lamps...
 ]]
 		global.player_hunger = {}
 						
@@ -910,8 +913,7 @@ Darkness is a hazard in the mines, stay near your lamps..
 		global.darkness_threat_level[player.name] = 0
 		player.insert {name = 'pistol', count = 1}
 		player.insert {name = 'coin', count = 10}		
-		player.insert {name = 'firearm-magazine', count = 30}			
-		player.insert {name = 'iron-axe', count = 1}		
+		player.insert {name = 'firearm-magazine', count = 30}
 	end
 	create_cave_miner_button(player)
 	create_cave_miner_stats_gui(player)
@@ -1306,8 +1308,10 @@ local function on_gui_click(event)
 	if not event.element.valid then return end		
 	local player = game.players[event.element.player_index]
 	local name = event.element.name
-	local frame = player.gui.top["caver_miner_stats_frame"]	
-	if name == "caver_miner_stats_toggle_button" and frame == nil then create_cave_miner_stats_gui(player) end	
+	local frame = player.gui.top["caver_miner_stats_frame"]
+	if name == "caver_miner_stats_toggle_button" and frame == nil then
+		create_cave_miner_stats_gui(player)
+	end	
 	if name == "caver_miner_stats_toggle_button" and frame then
 		if player.gui.left["cave_miner_info"] then
 			frame.destroy()

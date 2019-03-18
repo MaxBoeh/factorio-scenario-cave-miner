@@ -98,7 +98,6 @@ local function on_player_joined_game(event)
 	end	
 	if player.online_time < 10 then				
 		player.insert {name = 'raw-fish', count = 3}
-		player.insert {name = 'iron-axe', count = 1}
 		player.insert {name = 'light-armor', count = 1}
 	end	
 end

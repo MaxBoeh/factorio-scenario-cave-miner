@@ -100,7 +100,7 @@ local function secret_shop(pos, surface)
 	{price = {{"raw-fish", 5}}, offer = {type = 'give-item', item = 'train-stop'}},	
 	{price = {{"raw-fish", 1}}, offer = {type = 'give-item', item = 'small-lamp'}},
 	{price = {{"raw-fish", 2}}, offer = {type = 'give-item', item = 'firearm-magazine'}},
-	{price = {{"raw-fish", 1}}, offer = {type = 'give-item', item = 'raw-wood', count = math_random(25,75)}},
+	{price = {{"raw-fish", 1}}, offer = {type = 'give-item', item = 'wood', count = math_random(25,75)}},
 	{price = {{"raw-fish", 1}}, offer = {type = 'give-item', item = 'iron-ore', count = math_random(25,75)}},
 	{price = {{"raw-fish", 1}}, offer = {type = 'give-item', item = 'copper-ore', count = math_random(25,75)}},
 	{price = {{"raw-fish", 1}}, offer = {type = 'give-item', item = 'stone', count = math_random(25,75)}},
@@ -456,7 +456,6 @@ local function on_player_joined_game(event)
 			
 	if player.online_time < 1 then
 		player.insert({name = "submachine-gun", count = 1})
-		player.insert({name = "iron-axe", count = 1})
 		player.insert({name = "iron-plate", count = 64})
 		player.insert({name = "grenade", count = 3})
 		player.insert({name = "raw-fish", count = 5})
