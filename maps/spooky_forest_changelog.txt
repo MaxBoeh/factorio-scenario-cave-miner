@@ -1,0 +1,22 @@
+0.06
+added markets
+added hunger and respawning fish
+
+0.05
+map reveal fixes
+reduced evolution
+
+0.04
+disabled flamethrower turret
+
+0.03
+bigger map reveal on nest findings
+more ore
+more tree
+
+0.02
+less ore spawns
+less evolution game on nest destruction
+
+0.01
+spooked ya
