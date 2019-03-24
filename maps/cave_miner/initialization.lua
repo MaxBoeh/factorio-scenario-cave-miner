@@ -5,7 +5,10 @@ local config = require "maps.cave_miner.config"
 local scenario_init_done = false
 
 local function init_scenario()
-    local surface = game.surfaces[1]
+    
+	local surface = game.surfaces[1]
+	local gen_settings = surface.map_gen_settings
+	
 	game.forces["player"].set_spawn_position(
         surface.find_non_colliding_position("player", {0,-40}, 10, 1),
         surface
@@ -44,7 +47,7 @@ Darkness is a hazard in the mines, stay near your lamps...
 	global.rock_raffle = {"sand-rock-big","sand-rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-huge"}
 
 	-- starting area is based on the starting area size setting.
-	global.spawn_dome_size = 20000 * game.surfaces[1].map_gen_settings.starting_area;
+	global.spawn_dome_size = 20000 * gen_settings.starting_area;
 	
 	global.worm_free_zone_radius = math.sqrt(global.spawn_dome_size) + 40
 	
