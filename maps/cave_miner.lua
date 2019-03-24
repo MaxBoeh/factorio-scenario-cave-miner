@@ -9,40 +9,42 @@ local Event = require 'utils.event'
 local market_items = require "maps.cave_miner.market_items"
 
 local darkness_messages = {
-		"Something is lurking in the dark...",
-		"A shadow moves. I doubt it is friendly...",
-		"The silence grows louder...",
-		"Trust not your eyes. They are useless in the dark.",
-		"The darkness hides only death. Turn back now.",
-		"You hear noises...",
-		"They chitter as if laughing, hungry for their next foolish meal...",
-		"Despite what the radars tell you, it is not safe here...",
-		"The shadows are moving...",
-		"You feel like, something is watching you...",		
-		}
+	"Something is lurking in the dark...",
+	"A shadow moves. I doubt it is friendly...",
+	"The silence grows louder...",
+	"Trust not your eyes. They are useless in the dark.",
+	"The darkness hides only death. Turn back now.",
+	"You hear noises...",
+	"They chitter as if laughing, hungry for their next foolish meal...",
+	"Despite what the radars tell you, it is not safe here...",
+	"The shadows are moving...",
+	"You feel like, something is watching you...",
+	"You feel like, something is watching you...",
+	"You feel like, something is watching you...",
+}
 
 local rock_inhabitants = {
-		[1] = {"small-biter"},
-		[2] = {"small-biter","small-biter"},
-		[3] = {"small-biter","small-biter","small-biter"},
-		[4] = {"small-biter","small-biter","small-biter","small-biter"},
-		[5] = {"small-biter","small-biter","small-biter","medium-biter"},
-		[6] = {"small-biter","small-biter","medium-biter","medium-biter"},
-		[7] = {"small-biter","medium-biter","medium-biter","medium-biter"},
-		[8] = {"small-biter","medium-biter","medium-biter","medium-biter"},
-		[9] = {"small-biter","medium-biter","medium-biter","medium-spitter","big-biter"},
-		[10] = {"medium-biter","medium-biter","medium-biter","big-biter","big-biter"},
-		[11] = {"medium-biter","medium-biter","big-biter","big-biter","big-spitter"},
-		[12] = {"medium-biter","big-biter","big-biter","big-biter","big-spitter"},
-		[13] = {"big-biter","big-biter","big-biter","big-biter","big-biter"},
-		[14] = {"big-biter","big-biter","big-biter","big-biter","big-spitter","big-spitter"},
-		[15] = {"big-biter","big-biter","big-biter","behemoth-biter","big-spitter","big-spitter"},
-		[16] = {"big-biter","big-biter","big-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
-		[17] = {"big-biter","big-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
-		[18] = {"big-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
-		[19] = {"behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
-		[20] = {"behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter","behemoth-spitter"}
-	}
+	[1] = {"small-biter"},
+	[2] = {"small-biter","small-biter"},
+	[3] = {"small-biter","small-biter","small-biter"},
+	[4] = {"small-biter","small-biter","small-biter","small-biter"},
+	[5] = {"small-biter","small-biter","small-biter","medium-biter"},
+	[6] = {"small-biter","small-biter","medium-biter","medium-biter"},
+	[7] = {"small-biter","medium-biter","medium-biter","medium-biter"},
+	[8] = {"small-biter","medium-biter","medium-biter","medium-biter"},
+	[9] = {"small-biter","medium-biter","medium-biter","medium-spitter","big-biter"},
+	[10] = {"medium-biter","medium-biter","medium-biter","big-biter","big-biter"},
+	[11] = {"medium-biter","medium-biter","big-biter","big-biter","big-spitter"},
+	[12] = {"medium-biter","big-biter","big-biter","big-biter","big-spitter"},
+	[13] = {"big-biter","big-biter","big-biter","big-biter","big-biter"},
+	[14] = {"big-biter","big-biter","big-biter","big-biter","big-spitter","big-spitter"},
+	[15] = {"big-biter","big-biter","big-biter","behemoth-biter","big-spitter","big-spitter"},
+	[16] = {"big-biter","big-biter","big-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
+	[17] = {"big-biter","big-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
+	[18] = {"big-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
+	[19] = {"behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter"},
+	[20] = {"behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter","behemoth-spitter"}
+}
 
 local player_hunger_fish_food_value = 10
 local player_hunger_spawn_value = 80				
@@ -268,8 +270,6 @@ local function on_player_joined_game(event)
 		
 		game.map_settings.enemy_evolution.destroy_factor = 0.004
 		
-		global.spawn_dome_size = 20000
-		
 		global.cave_miner_map_info = [[
 Delve deep for greater treasures, but also face increased dangers.
 Mining productivity research, will overhaul your mining equipment,
@@ -305,7 +305,7 @@ Darkness is a hazard in the mines, stay near your lamps...
 		
 		global.rock_density = 62  ---- insert value up to 100
 		global.rock_raffle = {"sand-rock-big","sand-rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-huge"}
-										
+			
 		global.worm_free_zone_radius = math.sqrt(global.spawn_dome_size) + 40
 		
 		global.biter_spawn_schedule = {}										
@@ -472,10 +472,10 @@ local function darkness_checks()
 end
 
 local healing_amount = {
-		["rock-big"] = 4,
-		["sand-rock-big"] = 4,
-		["rock-huge"] = 16
-	}
+	["rock-big"] = 4,
+	["sand-rock-big"] = 4,
+	["rock-huge"] = 16
+}
 local function heal_rocks()
 	for key, rock in pairs(global.damaged_rocks) do
 		if rock.last_damage + 300 < game.tick then
@@ -520,26 +520,26 @@ local function on_tick(event)
 	end
 	
 	if game.tick == 30 then
-		local surface = game.surfaces[1]									
+		local surface = game.surfaces[1]
 		local p = game.surfaces[1].find_non_colliding_position("market",{0,-15},60,0.5)
 		local market = surface.create_entity {name = "market", position = p}
 		market.destructible = false
 		
 		for _, item in pairs(market_items.spawn) do
 			market.add_market_item(item)
-		end			
+		end
 		surface.regenerate_entity({"rock-big","rock-huge"})			
-	end						
+	end
 end
 
 local disabled_for_deconstruction = {
-		["fish"] = true,
-		["rock-huge"] = true,
-		["rock-big"] = true,
-		["sand-rock-big"] = true,
-		["tree-02"] = true,
-		["tree-04"] = true
-	}
+	["fish"] = true,
+	["rock-huge"] = true,
+	["rock-big"] = true,
+	["sand-rock-big"] = true,
+	["tree-02"] = true,
+	["tree-04"] = true
+}
 	
 local function on_marked_for_deconstruction(event)	
 	if disabled_for_deconstruction[event.entity.name] then
@@ -758,62 +758,6 @@ local function on_player_used_capsule(event)
 	end
 end
 
-local bank_messages = {
-	"Coinbank. The only choice.",
-	"Smart miners use Coinbank!",
-	"Coinbank, because inventory space matters!"
-	}
-	
-local function on_market_item_purchased(event)	
-	local player = game.players[event.player_index]	
-	local market = event.market
-	local offer_index = event.offer_index
-	local count = event.count
-	local offers = market.get_market_items()	
-	local bought_offer = offers[offer_index].offer	
-	if bought_offer.type ~= "nothing" then return end
-	if not global.fish_bank then global.fish_bank = {} end
-	if not global.fish_bank[player.name] then global.fish_bank[player.name] = 0 end
-	
-	if offer_index == 1 then
-		local fish_removed = player.remove_item({name = "coin", count = 999999})
-		if fish_removed == 0 then return end
-		global.fish_bank[player.name] = global.fish_bank[player.name] + fish_removed				
-		player.print(fish_removed .. " Coins deposited into your account. Your balance is " .. global.fish_bank[player.name] .. ".", {r=0.10, g=0.75, b=0.5})
-		player.print(bank_messages[math.random(1,#bank_messages)], { r=0.77, g=0.77, b=0.77})
-		player.surface.create_entity({name = "flying-text", position = player.position, text = tostring(fish_removed .. " Coins deposited"), color = {r=0.10, g=0.75, b=0.5}})
-	end
-	
-	if offer_index == 2 then
-		if global.fish_bank[player.name] == 0 then
-			player.print("No coins in your Bank account :(", { r=0.10, g=0.75, b=0.5})
-			return
-		end
-		
-		local requested_withdraw_amount = 500
-		local fee = 10		
-		if global.fish_bank[player.name] < requested_withdraw_amount + fee then		
-			fee = math.ceil(global.fish_bank[player.name] * 0.01, 0)
-			if global.fish_bank[player.name] < 10 then fee = 0 end
-			requested_withdraw_amount = global.fish_bank[player.name] - fee
-		end			
-		local fish_withdrawn = player.insert({name = "coin", count = requested_withdraw_amount})
-		if fish_withdrawn ~= requested_withdraw_amount then
-			player.remove_item({name = "coin", count = fish_withdrawn})
-			return
-		end								
-		global.fish_bank[player.name] = global.fish_bank[player.name] - (fish_withdrawn + fee)
-		player.print(fish_withdrawn .. " Coins withdrawn from your account. Your balance is " .. global.fish_bank[player.name] .. ".", { r=0.10, g=0.75, b=0.5})
-		player.print(bank_messages[math.random(1,#bank_messages)], { r=0.77, g=0.77, b=0.77})
-		player.surface.create_entity({name = "flying-text", position = player.position, text = tostring(fish_withdrawn .. " Coins withdrawn"), color = {r=0.10, g=0.75, b=0.5}})
-	end	
-	
-	if offer_index == 3 then						
-		player.print("Your balance is " .. global.fish_bank[player.name] .. " Coins.", { r=0.10, g=0.75, b=0.5})
-	end
-end
-
-Event.add(defines.events.on_market_item_purchased, on_market_item_purchased)
 Event.add(defines.events.on_player_used_capsule, on_player_used_capsule)
 Event.add(defines.events.on_gui_click, on_gui_click)
 Event.add(defines.events.on_research_finished, on_research_finished)
