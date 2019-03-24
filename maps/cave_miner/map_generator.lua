@@ -1,6 +1,8 @@
 
 local Event = require 'utils.event' 
 local simplex_noise = require 'utils.simplex_noise'
+local config = require 'maps.cave_miner.config'
+local infinity_chests = require 'maps.cave_miner.infinity_chests'
 
 local worm_raffle_table = {
     [1] = {"small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret"},
@@ -15,6 +17,18 @@ local worm_raffle_table = {
     [10] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret", "big-worm-turret"}
 }
 
+local infinity_chest_raffle = {}
+local infinity_chest_raffle_config = {
+    { weight = 10, amount = 4, ticks = 10, name = "wood" },
+    { weight = 8, amount = 4, ticks = 10, name = "uranium-ore" },
+    { weight = 8, amount = 4, ticks = 10, name = "iron-ore" },
+    { weight = 8, amount = 4, ticks = 10, name = "copper-ore" },
+    { weight = 3, amount = 2, ticks = 10, name = "steel-plate" },
+    { weight = 4, amount = 2, ticks = 10, name = "electronic-circuit" },
+    { weight = 1, amount = 2, ticks = 10, name = "advanced-circuit" },
+    { weight = 1, amount = 2, ticks = 10, name = "processing-unit" }
+}
+
 local function shuffle(tbl)
 	local size = #tbl
 		for i = size, 1, -1 do
@@ -22,6 +36,18 @@ local function shuffle(tbl)
 			tbl[i], tbl[rand] = tbl[rand], tbl[i]
 		end
 	return tbl
+end
+
+local function get_infinity_chest_raffle()
+    if #infinity_chest_raffle == 0 then
+        for _,chest_config in pairs(infinity_chest_raffle_config) do
+            for i=0,chest_config.weight,1 do
+                table.insert(infinity_chest_raffle, chest_config)
+            end
+        end
+        infinity_chest_raffle = shuffle(infinity_chest_raffle)
+    end
+    return infinity_chest_raffle;
 end
 
 local function treasure_chest(position, distance_to_center)	
@@ -279,6 +305,23 @@ local function secret_shop(pos)
 	end
 end
 
+local function infinity_chest(position)
+    local infinity_chest_raffle = get_infinity_chest_raffle()
+
+    local surface = game.surfaces[1]
+    local chest = surface.create_entity {name = "steel-chest", position = position, force = "player"}
+    chest.minable = false
+    chest.destructible = false
+
+    chest_config = infinity_chest_raffle[math.random(1,#infinity_chest_raffle)]
+    infinity_chests.add_chest(
+        chest,
+        chest_config.name,
+        chest_config.amount,
+        chest_config.ticks
+    )
+end
+
 local function on_chunk_generated(event)	
 	local surface = game.surfaces[1]	
 	local noise = {}
@@ -290,7 +333,8 @@ local function on_chunk_generated(event)
 	local fish_positions = {}
 	local rare_treasure_chest_positions = {}
 	local treasure_chest_positions = {}
-	local secret_shop_locations = {}
+    local secret_shop_locations = {}
+    local infinity_chest_locations = {}
 	local extra_tree_positions = {}
 	local spawn_tree_positions = {}
 	local tile_to_insert = false
@@ -365,16 +409,17 @@ local function on_chunk_generated(event)
 						if cave_noise > 0.98 then 
 							tile_to_insert = "water"
 						else
+                            if cave_noise > 0.94 then
+                                table.insert(extra_tree_positions, {pos_x,pos_y})
+                                table.insert(secret_shop_locations, {pos_x,pos_y})		
+                                table.insert(infinity_chest_locations, {pos_x,pos_y})								
+                            end
 							if cave_noise > 0.82 then
 								tile_to_insert = "grass-1"
 								table.insert(enemy_building_positions, {pos_x,pos_y})
 								table.insert(enemy_can_place_worm_positions, {pos_x,pos_y})
 								--tile_to_insert = "grass-4"
 								--if cave_noise > 0.88 then tile_to_insert = "grass-2" end
-								if cave_noise > 0.94 then
-									table.insert(extra_tree_positions, {pos_x,pos_y})
-									table.insert(secret_shop_locations, {pos_x,pos_y})									
-								end								
 							else
 								if cave_noise > 0.72 then
 									tile_to_insert = "dirt-6"
@@ -502,7 +547,7 @@ local function on_chunk_generated(event)
 		end
 		]]--
 	end
-	
+    
 	for _, p in pairs(enemy_building_positions) do	
 		if math.random(1,50)==1 then
 			local pos = surface.find_non_colliding_position("biter-spawner", p, 8, 1)
@@ -541,19 +586,46 @@ local function on_chunk_generated(event)
 			end
 		end
 	end
-		
-	for _, p in pairs(fish_positions) do	
+
+    for _, p in pairs(fish_positions) do	
 		if math.random(1,16)==1 then
 			if surface.can_place_entity({name="fish",position=p}) then
 				surface.create_entity {name="fish",position=p}
 			end
 		end
 	end
-		
+        
+    local shop_block_range = config.generator.shop_block_range
 	for _, p in pairs(secret_shop_locations) do	
 		if math.random(1,10)==1 then
-			if surface.count_entities_filtered{area={{p[1]-125,p[2]-125},{p[1]+125,p[2]+125}}, name="market", limit=1} == 0 then
+            local shop_filter = {
+                area={
+                    { p[1]-shop_block_range, p[2]-shop_block_range },
+                    { p[1]+shop_block_range, p[2]+shop_block_range }
+                },
+                name="market",
+                limit=1
+            }
+			if surface.count_entities_filtered(shop_filter) == 0 then
 				secret_shop(p)
+			end
+		end
+	end	
+
+    local infinity_chest_block_range = config.generator.infinity_chest_block_range
+	for _, p in pairs(infinity_chest_locations) do	
+		if math.random(1,10)==1 then
+            local chest_filter = {
+                area={
+                    { p[1]-infinity_chest_block_range, p[2]-infinity_chest_block_range },
+                    { p[1]+infinity_chest_block_range, p[2]+infinity_chest_block_range }
+                },
+                name="steel-chest",
+                limit=1
+            }
+            p = surface.find_non_colliding_position("steel-chest", p, 5, 0.5)
+			if surface.count_entities_filtered(chest_filter) == 0 then
+				infinity_chest(p)
 			end
 		end
 	end		
@@ -584,5 +656,5 @@ Event.add(defines.events.on_chunk_generated, on_chunk_generated)
 
 return {
     treasure_chest = treasure_chest,
-    rare_treasure_chest = rare_treasure_chest
+    infinity_chest = infinity_chest
 }

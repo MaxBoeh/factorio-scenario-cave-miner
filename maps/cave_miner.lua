@@ -176,6 +176,7 @@ local function on_tick(event)
 		for _, item in pairs(market_items.spawn) do
 			market.add_market_item(item)
 		end
+
 		surface.regenerate_entity({"rock-big","rock-huge"})			
 	end
 end
@@ -360,8 +361,8 @@ end
 
 local function on_player_respawned(event)
 	local player = game.players[event.player_index]
-		player.insert {name = 'pistol', count = 1}
-		player.insert {name = 'firearm-magazine', count = 10}			
+	player.insert {name = 'pistol', count = 1}
+	player.insert {name = 'firearm-magazine', count = 10}			
 	player.character.disable_flashlight()
 	global.player_hunger[player.name] = config.player_hunger_spawn_value
 	hunger_update(player, 0)

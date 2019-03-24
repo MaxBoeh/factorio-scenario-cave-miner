@@ -71,5 +71,10 @@ Darkness is a hazard in the mines, stay near your lamps...
         "You feel like, something is watching you...",
         "You feel like, something is watching you...",
         "You feel like, something is watching you...",
+    },
+
+    generator = {
+        shop_block_range = 125,
+        infinity_chest_block_range = 40
     }
 }
