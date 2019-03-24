@@ -2,11 +2,14 @@
 --You can use /c map_pregen() command to pre-generate the world before playing to avoid any possible microstutter while playing.--
 --Use /c spaghetti() to play without bots.
 
+local Event = require 'utils.event' 
 local map_generator = require "maps.cave_miner.map_generator"
+local biter_attacks = require "maps.cave_miner.biter_attacks"
+local market_items = require "maps.cave_miner.market_items"
+local config = require "maps.cave_miner.config"
+require "maps.cave_miner.initialization"
 require "maps.cave_miner.kaboomsticks"
 require "maps.tools.map_pregen"
-local Event = require 'utils.event' 
-local market_items = require "maps.cave_miner.market_items"
 
 local darkness_messages = {
 	"Something is lurking in the dark...",
@@ -47,7 +50,6 @@ local rock_inhabitants = {
 }
 
 local player_hunger_fish_food_value = 10
-local player_hunger_spawn_value = 80				
 local player_hunger_stages = {}
 for x = 1, 200, 1 do
 	if x <= 200 then player_hunger_stages[x] = "Obese" end						
@@ -222,14 +224,14 @@ local function hunger_update(player, food_value)
 	if global.player_hunger[player.name] > 200 then global.player_hunger[player.name] = 200 end
 			
 	if past_hunger == 200 and global.player_hunger[player.name] + food_value > 200 then
-		global.player_hunger[player.name] = player_hunger_spawn_value
+		global.player_hunger[player.name] = config.player_hunger_spawn_value
 		player.character.die("player")
 		local t = {" ate too much and exploded.", " should have gone on a diet.", " needs to work on their bad eating habbits.", " should have skipped dinner today."}
 		game.print(player.name .. t[math.random(1,#t)], { r=0.75, g=0.0, b=0.0})				
 	end	
 	
 	if global.player_hunger[player.name] < 1 then
-		global.player_hunger[player.name] = player_hunger_spawn_value
+		global.player_hunger[player.name] = config.player_hunger_spawn_value
 		player.character.die("player")
 		local t = {" ran out of foodstamps.", " starved.", " should not have skipped breakfast today."}
 		game.print(player.name .. t[math.random(1,#t)], { r=0.75, g=0.0, b=0.0})	
@@ -253,93 +255,12 @@ local function hunger_update(player, food_value)
 end
 
 local function on_player_joined_game(event)
-	local surface = game.surfaces[1]	
 	local player = game.players[event.player_index]
-	if not global.cave_miner_init_done then		 
-		local p = surface.find_non_colliding_position("player", {0,-40}, 10, 1)
-		game.forces["player"].set_spawn_position(p,surface)
-		player.teleport(p)
-		surface.daytime = 0.5
-		surface.freeze_daytime = 1
-		game.forces["player"].technologies["landfill"].enabled = false
-		game.forces["player"].technologies["night-vision-equipment"].enabled = false
-		game.forces["player"].technologies["artillery-shell-range-1"].enabled = false			
-		game.forces["player"].technologies["artillery-shell-speed-1"].enabled = false
-		game.forces["player"].technologies["artillery"].enabled = false	
-		game.forces["player"].technologies["atomic-bomb"].enabled = false	
-		
-		game.map_settings.enemy_evolution.destroy_factor = 0.004
-		
-		global.cave_miner_map_info = [[
-Delve deep for greater treasures, but also face increased dangers.
-Mining productivity research, will overhaul your mining equipment,
-reinforcing your pickaxe as well as increasing the size of your backpack.
 
-Breaking rocks is exhausting and might make you hungry.
-So don´t forget to eat some fish once in a while to stay well fed.
-But be careful, eating too much might have it´s consequences too.
+	global.player_hunger[player.name] = config.player_hunger_spawn_value
+	hunger_update(player, 0)
 
-As you dig, you will encounter black bedrock that is just too solid for your pickaxe.
-Some explosives could even break through the impassable dark rock.
-All they need is a container and a well aimed shot.
-
-Darkness is a hazard in the mines, stay near your lamps...
-]]
-		global.player_hunger = {}
-						
-		global.damaged_rocks = {}
-		
-		global.biter_spawn_amount_weights = {}				
-		global.biter_spawn_amount_weights[1] = {64, 1}
-		global.biter_spawn_amount_weights[2] = {32, 4}
-		global.biter_spawn_amount_weights[3] = {16, 8}
-		global.biter_spawn_amount_weights[4] = {8, 16}
-		global.biter_spawn_amount_weights[5] = {4, 32}
-		global.biter_spawn_amount_weights[6] = {2, 64}
-		global.biter_spawn_amount_raffle = {}
-		for _, t in pairs (global.biter_spawn_amount_weights) do
-			for x = 1, t[2], 1 do
-				table.insert(global.biter_spawn_amount_raffle, t[1])
-			end			
-		end
-		
-		global.rock_density = 62  ---- insert value up to 100
-		global.rock_raffle = {"sand-rock-big","sand-rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-huge"}
-			
-		global.worm_free_zone_radius = math.sqrt(global.spawn_dome_size) + 40
-		
-		global.biter_spawn_schedule = {}										
-		
-		global.ore_spill_cap = 35
-		global.stats_rocks_broken = 0
-		global.stats_ores_found = 0
-		global.total_ores_mined = 0
-		
-		global.rock_mining_chance_weights = {}
-		global.rock_mining_chance_weights[1] = {"iron-ore",25}
-		global.rock_mining_chance_weights[2] = {"copper-ore",18}
-		global.rock_mining_chance_weights[3] = {"coal",14}
-		global.rock_mining_chance_weights[4] = {"uranium-ore",3}
-		global.rock_mining_raffle_table = {}				
-		for _, t in pairs (global.rock_mining_chance_weights) do
-			for x = 1, t[2], 1 do
-				table.insert(global.rock_mining_raffle_table, t[1])
-			end			
-		end
-
-		global.darkness_threat_level = {}							
-		
-		global.cave_miner_init_done = true						
-	end
-	if player.online_time < 10 then
-		create_cave_miner_info(player)
-		global.player_hunger[player.name] = player_hunger_spawn_value
-		hunger_update(player, 0)
-		global.darkness_threat_level[player.name] = 0
-		player.insert {name = 'pistol', count = 1}
-		player.insert {name = 'coin', count = 10}		
-		player.insert {name = 'firearm-magazine', count = 30}
-	end
+	create_cave_miner_info(player)
 	create_cave_miner_button(player)
 	create_cave_miner_stats_gui(player)
 end
@@ -359,68 +280,6 @@ local function spawn_cave_inhabitant(pos, target_position)
 	if target_position then biter.set_command({type=defines.command.attack_area, destination=target_position, radius=5, distraction=defines.distraction.by_anything}) end
 	if not target_position then biter.set_command({type=defines.command.attack_area, destination=game.forces["player"].get_spawn_position(surface), radius=5, distraction=defines.distraction.by_anything}) end
 end
-
-local function find_first_entity_spiral_scan(pos, entities, range)
-	if not pos then return end
-	if not entities then return end
-	if not range then return end
-	local surface = game.surfaces[1]
-	local out_of_map_count = 0
-	local out_of_map_cap = 1
-	for z = 2,range,2 do
-		pos.y = pos.y - 1
-		pos.x = pos.x - 1
-		for modifier = 1, -1, -2 do
-			for x = 1, z, 1 do
-				pos.x = pos.x + modifier	
-				local t = surface.get_tile(pos)
-				if t.name == "out-of-map" then out_of_map_count = out_of_map_count + 1 end				
-				if out_of_map_count > out_of_map_cap then return end
-				local e = surface.find_entities_filtered {position = pos, name = entities}						
-				if e[1] then return e[1].position end
-			end
-			for y = 1, z, 1 do
-				pos.y = pos.y + modifier	
-				local t = surface.get_tile(pos)
-				if t.name == "out-of-map" then out_of_map_count = out_of_map_count + 1 end
-				if out_of_map_count > out_of_map_cap then return end
-				local e = surface.find_entities_filtered {position = pos, name = entities}					
-				if e[1] then return e[1].position end
-			end
-			if out_of_map_count > out_of_map_cap then return end
-		end	
-		if out_of_map_count > out_of_map_cap then return end				
-	end		
-end
-
-local function biter_attack_event()
-	local surface = game.surfaces[1]
-	local valid_positions = {}
-	for _, player in pairs(game.connected_players) do
-		if player.character.driving == false then
-			local position = {x = player.position.x, y = player.position.y}
-			local p = find_first_entity_spiral_scan(position, {"rock-huge", "rock-big", "sand-rock-big"}, 48)		
-			if p then
-				if p.x^2 + p.y^2 > global.spawn_dome_size then table.insert(valid_positions, p) end
-			end
-		end
-	end
-	if valid_positions[1] then
-		if #valid_positions == 1 then
-			for x = 1, global.biter_spawn_amount_raffle[math.random(1,#global.biter_spawn_amount_raffle)],1 do
-				table.insert(global.biter_spawn_schedule, {game.tick + 20*x, valid_positions[1]})
-			end
-		end
-		if #valid_positions > 1 then
-			for y = math.random(1,2), #valid_positions, 2 do
-				if y > #valid_positions then break end
-				for x = 1, global.biter_spawn_amount_raffle[math.random(1,#global.biter_spawn_amount_raffle)],1 do
-					table.insert(global.biter_spawn_schedule, {game.tick + 20*x, valid_positions[y]})
-				end
-			end
-		end
-	end
-end	
 
 local function darkness_events()
 	for _, p in pairs (game.connected_players) do		
@@ -489,21 +348,7 @@ local function heal_rocks()
 	end
 end
 
-local function on_tick(event)		
-	if game.tick % 30 == 0 then
-		if global.biter_spawn_schedule then										
-			for x = 1, #global.biter_spawn_schedule, 1 do
-				if global.biter_spawn_schedule[x] then					
-					if game.tick >= global.biter_spawn_schedule[x][1] then
-						local pos = {x = global.biter_spawn_schedule[x][2].x, y = global.biter_spawn_schedule[x][2].y}
-						global.biter_spawn_schedule[x] = nil
-						spawn_cave_inhabitant(pos)
-					end						
-				end
-			end								
-		end
-	end		
-	
+local function on_tick(event)	
 	if game.tick % 960 == 0 then
 		darkness_checks()	
 		darkness_events()
@@ -515,8 +360,6 @@ local function on_tick(event)
 			if player.afk_time < 18000 then	hunger_update(player, -1) end		
 		end
 		refresh_gui()
-		
-		if math.random(1,2) == 1 then biter_attack_event() end
 	end
 	
 	if game.tick == 30 then
@@ -554,8 +397,8 @@ local function pre_player_mined_item(event)
 	if math.random(1,12) == 1 then
 		if event.entity.name == "rock-huge" or event.entity.name == "rock-big" or event.entity.name == "sand-rock-big" then		
 			for x = 1, math.random(6, 10), 1 do
-				table.insert(global.biter_spawn_schedule, {game.tick + 15*x, event.entity.position})		
-			end			
+				biter_attacks.add_biter_spawn(game.tick + 15*x, event.entity.position)
+			end
 		end
 	end
 				
@@ -691,7 +534,7 @@ local function on_entity_damaged(event)
 			if event.force.name == "player" then	
 				if math.random(1,12) == 1 then								
 					for x = 1, math.random(6,10), 1 do
-						table.insert(global.biter_spawn_schedule, {game.tick + 10*x, event.entity.position})		
+						biter_attacks.add_biter_spawn({game.tick + 10*x, event.entity.position})
 					end						
 				end
 			end
@@ -716,7 +559,7 @@ local function on_player_respawned(event)
 		player.insert {name = 'pistol', count = 1}
 		player.insert {name = 'firearm-magazine', count = 10}			
 	player.character.disable_flashlight()
-	global.player_hunger[player.name] = player_hunger_spawn_value
+	global.player_hunger[player.name] = config.player_hunger_spawn_value
 	hunger_update(player, 0)
 	refresh_gui()
 end
