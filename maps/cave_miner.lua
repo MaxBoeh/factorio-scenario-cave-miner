@@ -2,11 +2,11 @@
 --You can use /c map_pregen() command to pre-generate the world before playing to avoid any possible microstutter while playing.--
 --Use /c spaghetti() to play without bots.
 
-require "maps.cave_miner_kaboomsticks"
 require "maps.cave_miner.map_generator"
+require "maps.cave_miner.kaboomsticks"
 require "maps.tools.map_pregen"
 local Event = require 'utils.event' 
-local market_items = require "maps.cave_miner_market_items"
+local market_items = require "maps.cave_miner.market_items"
 
 local darkness_messages = {
 		"Something is lurking in the dark...",
