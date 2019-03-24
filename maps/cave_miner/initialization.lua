@@ -43,7 +43,11 @@ Darkness is a hazard in the mines, stay near your lamps...
 	global.rock_density = 62  ---- insert value up to 100
 	global.rock_raffle = {"sand-rock-big","sand-rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-huge"}
 		
-	global.spawn_dome_size = 20000
+	game.print(game.surfaces[1].map_gen_settings.starting_area);
+	
+	-- starting area is based on the starting area size setting.
+	global.spawn_dome_size = 20000 * game.surfaces[1].map_gen_settings.starting_area;
+	
 	global.worm_free_zone_radius = math.sqrt(global.spawn_dome_size) + 40
 	
 	global.ore_spill_cap = 35
