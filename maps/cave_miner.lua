@@ -3,28 +3,16 @@
 --Use /c spaghetti() to play without bots.
 
 local Event = require 'utils.event' 
-local map_generator = require "maps.cave_miner.map_generator"
-local biter_attacks = require "maps.cave_miner.biter_attacks"
-local market_items = require "maps.cave_miner.market_items"
-local config = require "maps.cave_miner.config"
+
 require "maps.cave_miner.initialization"
 require "maps.cave_miner.kaboomsticks"
 require "maps.tools.map_pregen"
 
-local darkness_messages = {
-	"Something is lurking in the dark...",
-	"A shadow moves. I doubt it is friendly...",
-	"The silence grows louder...",
-	"Trust not your eyes. They are useless in the dark.",
-	"The darkness hides only death. Turn back now.",
-	"You hear noises...",
-	"They chitter as if laughing, hungry for their next foolish meal...",
-	"Despite what the radars tell you, it is not safe here...",
-	"The shadows are moving...",
-	"You feel like, something is watching you...",
-	"You feel like, something is watching you...",
-	"You feel like, something is watching you...",
-}
+local biter_attacks = require "maps.cave_miner.biter_attacks"
+local config = require "maps.cave_miner.config"
+local gui = require "maps.cave_miner.gui"
+local map_generator = require "maps.cave_miner.map_generator"
+local market_items = require "maps.cave_miner.market_items"
 
 local rock_inhabitants = {
 	[1] = {"small-biter"},
@@ -49,172 +37,8 @@ local rock_inhabitants = {
 	[20] = {"behemoth-biter","behemoth-biter","behemoth-biter","behemoth-biter","behemoth-spitter","behemoth-spitter"}
 }
 
-local player_hunger_fish_food_value = 10
-local player_hunger_stages = {}
-for x = 1, 200, 1 do
-	if x <= 200 then player_hunger_stages[x] = "Obese" end						
-	if x <= 179 then player_hunger_stages[x] = "Stuffed" end
-	if x <= 150 then player_hunger_stages[x] = "Bloated" end
-	if x <= 130 then player_hunger_stages[x] = "Sated" end
-	if x <= 110 then player_hunger_stages[x] = "Well Fed" end
-	if x <= 89 then player_hunger_stages[x] = "Nourished" end			
-	if x <= 70 then player_hunger_stages[x] = "Hungry" end
-	if x <= 35 then player_hunger_stages[x] = "Starving" end			
-end	
-
-local player_hunger_color_list = {}
-for x = 1, 50, 1 do
-	player_hunger_color_list[x] = 		{r = 0.5 + x*0.01, g = x*0.01, b = x*0.005}
-	player_hunger_color_list[50+x] = {r = 1 - x*0.02, g = 0.5 + x*0.01, b = 0.25}
-	player_hunger_color_list[100+x] = {r = 0 + x*0.02, g = 1 - x*0.01, b = 0.25}
-	player_hunger_color_list[150+x] = {r = 1 - x*0.01, g = 0.5 - x*0.01, b = 0.25 - x*0.005}
-end
-
-local player_hunger_buff = {}
-local buff_top_value = 0.70		
-for x = 1, 200, 1 do
-	player_hunger_buff[x] = buff_top_value
-end
-local y = 1
-for x = 89, 1, -1 do			
-	player_hunger_buff[x] = buff_top_value - y * 0.015
-	y = y + 1
-end
-local y = 1		
-for x = 111, 200, 1 do			
-	player_hunger_buff[x] = buff_top_value - y * 0.015
-	y = y + 1
-end
+local player_hunger_buff = config.player_hunger_buff
 		
-local function create_cave_miner_button(player)		
-	if player.gui.top["caver_miner_stats_toggle_button"] then player.gui.top["caver_miner_stats_toggle_button"].destroy() end	
-	local b = player.gui.top.add({ type = "sprite-button", name = "caver_miner_stats_toggle_button", sprite = "item/iron-ore" })
-	b.style.minimal_height = 38
-	b.style.minimal_width = 38
-	b.style.top_padding = 2
-	b.style.left_padding = 4
-	b.style.right_padding = 4
-	b.style.bottom_padding = 2
-end
-
-local function create_cave_miner_info(player)	
-	local frame = player.gui.left.add {type = "frame", name = "cave_miner_info", direction = "vertical"}
-	local t = frame.add {type = "table", column_count = 1}	
-	
-	local tt = t.add {type = "table", column_count = 3}
-	local l = tt.add {type = "label", caption = " --Cave Miner-- "}
-	l.style.font = "default"
-	l.style.font_color = {r=0.6, g=0.3, b=0.99}
-	l.style.top_padding = 6	
-	l.style.bottom_padding = 6
-	
-	local l = tt.add {type = "label", caption = " *diggy diggy hole* "}
-	l.style.font = "default"
-	l.style.font_color = {r=0.99, g=0.99, b=0.2}
-	l.style.minimal_width = 340	
-	
-	local b = tt.add {type = "button", caption = "X", name = "close_cave_miner_info", align = "right"}	
-	b.style.font = "default"
-	b.style.minimal_height = 30
-	b.style.minimal_width = 30
-	b.style.top_padding = 2
-	b.style.left_padding = 4
-	b.style.right_padding = 4
-	b.style.bottom_padding = 2
-	
-	local tt = t.add {type = "table", column_count = 1}
-	local frame = t.add {type = "frame"}
-	local l = frame.add {type = "label", caption = global.cave_miner_map_info}
-	l.style.single_line = false	
-	l.style.font_color = {r=0.95, g=0.95, b=0.95}	
-end
-
-local function create_cave_miner_stats_gui(player)	
-	if player.gui.top["hunger_frame"] then player.gui.top["hunger_frame"].destroy() end
-	if player.gui.top["caver_miner_stats_frame"] then player.gui.top["caver_miner_stats_frame"].destroy() end
-	
-	local captions = {}
-	local caption_style = {{"font", "default-bold"}, {"font_color",{ r=0.63, g=0.63, b=0.63}}, {"top_padding",2}, {"left_padding",0},{"right_padding",0},{"minimal_width",0}}
-	local stat_numbers = {}
-	local stat_number_style = {{"font", "default-bold"}, {"font_color",{ r=0.77, g=0.77, b=0.77}}, {"top_padding",2}, {"left_padding",0},{"right_padding",0},{"minimal_width",0}}
-	local separators = {}
-	local separator_style = {{"font", "default-bold"}, {"font_color",{ r=0.15, g=0.15, b=0.89}}, {"top_padding",2}, {"left_padding",2},{"right_padding",2},{"minimal_width",0}}
-	
-	local frame = player.gui.top.add { type = "frame", name = "hunger_frame"}
-	
-	local str = tostring(global.player_hunger[player.name])
-	str = str .. "% "
-	str = str .. player_hunger_stages[global.player_hunger[player.name]]
-	local caption_hunger = frame.add { type = "label", caption = str  }
-	caption_hunger.style.font = "default-bold"
-	caption_hunger.style.font_color = player_hunger_color_list[global.player_hunger[player.name]]
-	caption_hunger.style.top_padding = 2		
-	
-	local frame = player.gui.top.add { type = "frame", name = "caver_miner_stats_frame" }
-	
-	local t = frame.add { type = "table", column_count = 11 }						
-	
-	captions[1] = t.add { type = "label", caption = "Ores mined:" }
-	
-	global.total_ores_mined = global.stats_ores_found + game.forces.player.item_production_statistics.get_input_count("coal") + game.forces.player.item_production_statistics.get_input_count("iron-ore") + game.forces.player.item_production_statistics.get_input_count("copper-ore") + game.forces.player.item_production_statistics.get_input_count("uranium-ore")	
-	
-	stat_numbers[1] = t.add { type = "label", caption = global.total_ores_mined }
-			
-	separators[1] = t.add { type = "label", caption = "|"}
-	
-	captions[2] = t.add { type = "label", caption = "Rocks broken:" }
-	stat_numbers[2] = t.add { type = "label", caption = global.stats_rocks_broken }
-							
-	separators[2] = t.add { type = "label", caption = "|"}
-	
-	captions[3] = t.add { type = "label", caption = "Efficiency" }
-	local x = math.ceil(game.forces.player.manual_mining_speed_modifier * 100 + player_hunger_buff[global.player_hunger[player.name]] * 100, 0)
-	local str = ""
-	if x > 0 then str = str .. "+" end
-	str = str .. tostring(x)
-	str = str .. "%"		
-	stat_numbers[3] = t.add { type = "label", caption = str }
-		
-	if game.forces.player.manual_mining_speed_modifier > 0 or game.forces.player.mining_drill_productivity_bonus > 0 then	
-		separators[3] = t.add { type = "label", caption = "|"}
-		
-		captions[5] = t.add { type = "label", caption = "Fortune" }	
-		local str = "+"
-		str = str .. tostring(game.forces.player.mining_drill_productivity_bonus * 100)
-		str = str .. "%"	
-		stat_numbers[4] = t.add { type = "label", caption = str }
-		
-	end	
-	
-	for _, s in pairs (caption_style) do
-		for _, l in pairs (captions) do
-			l.style[s[1]] = s[2]
-		end
-	end
-	for _, s in pairs (stat_number_style) do
-		for _, l in pairs (stat_numbers) do
-			l.style[s[1]] = s[2]
-		end
-	end
-	for _, s in pairs (separator_style) do
-		for _, l in pairs (separators) do
-			l.style[s[1]] = s[2]
-		end
-	end
-	stat_numbers[1].style.minimal_width = 9 * string.len(tostring(global.stats_ores_found))
-	stat_numbers[2].style.minimal_width = 9 * string.len(tostring(global.stats_rocks_broken))
-end
-
-local function refresh_gui()
-	for _, player in pairs(game.connected_players) do
-		local frame = player.gui.top["caver_miner_stats_frame"]
-		if (frame) then			
-			create_cave_miner_button(player)
-			create_cave_miner_stats_gui(player)					
-		end
-	end
-end
-
 local function hunger_update(player, food_value)
 	
 	if food_value == -1 and player.character.driving == true then return end
@@ -237,6 +61,7 @@ local function hunger_update(player, food_value)
 		game.print(player.name .. t[math.random(1,#t)], { r=0.75, g=0.0, b=0.0})	
 	end
 	
+	local player_hunger_stages = config.player_hunger_stages
 	if player.character then
 		if player_hunger_stages[global.player_hunger[player.name]] ~= player_hunger_stages[past_hunger] then
 			local print_message = "You feel " .. player_hunger_stages[global.player_hunger[player.name]] .. "."
@@ -246,7 +71,7 @@ local function hunger_update(player, food_value)
 			if player_hunger_stages[global.player_hunger[player.name]] == "Starving" then
 				print_message = "You are starving!"
 			end
-			player.print(print_message, player_hunger_color_list[global.player_hunger[player.name]])
+			player.print(print_message, config.player_hunger_color_list[global.player_hunger[player.name]])
 		end
 	end
 	
@@ -259,10 +84,9 @@ local function on_player_joined_game(event)
 
 	global.player_hunger[player.name] = config.player_hunger_spawn_value
 	hunger_update(player, 0)
+	gui.refresh_gui()
 
-	create_cave_miner_info(player)
-	create_cave_miner_button(player)
-	create_cave_miner_stats_gui(player)
+	gui.create_cave_miner_stats_gui(player)
 end
 
 local function spawn_cave_inhabitant(pos, target_position)
@@ -294,7 +118,7 @@ local function darkness_events()
 			p.character.damage(math.random(global.darkness_threat_level[p.name]*1,global.darkness_threat_level[p.name]*2),"enemy")
 		end		
 		if global.darkness_threat_level[p.name] == 2 then
-			p.print(darkness_messages[math.random(1,#darkness_messages)],{ r=0.65, g=0.0, b=0.0})				
+			p.print(config.darkness_messages[math.random(1,#config.darkness_messages)],{ r=0.65, g=0.0, b=0.0})				
 		end
 		global.darkness_threat_level[p.name] = global.darkness_threat_level[p.name] + 1
 	end
@@ -330,36 +154,17 @@ local function darkness_checks()
 	end
 end
 
-local healing_amount = {
-	["rock-big"] = 4,
-	["sand-rock-big"] = 4,
-	["rock-huge"] = 16
-}
-local function heal_rocks()
-	for key, rock in pairs(global.damaged_rocks) do
-		if rock.last_damage + 300 < game.tick then
-			if rock.entity.valid then
-				rock.entity.health = rock.entity.health + healing_amount[rock.entity.name]
-				if rock.entity.prototype.max_health == rock.entity.health then global.damaged_rocks[key] = nil end
-			else
-				global.damaged_rocks[key] = nil
-			end
-		end
-	end
-end
-
-local function on_tick(event)	
+local function on_tick(event)
 	if game.tick % 960 == 0 then
 		darkness_checks()	
 		darkness_events()
-		heal_rocks()
 	end		
 	
 	if game.tick % 5400 == 2700 then
 		for _, player in pairs(game.connected_players) do
 			if player.afk_time < 18000 then	hunger_update(player, -1) end		
 		end
-		refresh_gui()
+		gui.refresh_gui()
 	end
 	
 	if game.tick == 30 then
@@ -454,7 +259,7 @@ local function pre_player_mined_item(event)
 		end
 		
 		global.stats_rocks_broken = global.stats_rocks_broken + 1		
-		refresh_gui()
+		gui.refresh_gui()
 		
 		if math.random(1,32) == 1 then				
 			local p = {x = rock_position.x, y = rock_position.y}
@@ -549,7 +354,6 @@ local function on_entity_damaged(event)
 			
 			global.stats_rocks_broken = global.stats_rocks_broken + 1
 			global.stats_ores_found = global.stats_ores_found + drop_amount + drop_amount_ore
-			--refresh_gui()						
 		end
 	end	
 end
@@ -561,48 +365,25 @@ local function on_player_respawned(event)
 	player.character.disable_flashlight()
 	global.player_hunger[player.name] = config.player_hunger_spawn_value
 	hunger_update(player, 0)
-	refresh_gui()
+	gui.refresh_gui()
 end
 
 local function on_research_finished(event)
 	game.forces.player.manual_mining_speed_modifier = game.forces.player.mining_drill_productivity_bonus * 6
 	game.forces.player.character_inventory_slots_bonus = game.forces.player.mining_drill_productivity_bonus * 500
-	refresh_gui()
-end
-
-local function on_gui_click(event)
-	if not event then return end
-	if not event.element then return end
-	if not event.element.valid then return end		
-	local player = game.players[event.element.player_index]
-	local name = event.element.name
-	local frame = player.gui.top["caver_miner_stats_frame"]
-	if name == "caver_miner_stats_toggle_button" and frame == nil then
-		create_cave_miner_stats_gui(player)
-	end	
-	if name == "caver_miner_stats_toggle_button" and frame then
-		if player.gui.left["cave_miner_info"] then
-			frame.destroy()
-			player.gui.top["hunger_frame"].destroy()
-			player.gui.left["cave_miner_info"].destroy()
-		else	
-			create_cave_miner_info(player)
-		end					
-	end
-	if name == "close_cave_miner_info" then player.gui.left["cave_miner_info"].destroy() end	
+	gui.refresh_gui()
 end
 
 local function on_player_used_capsule(event)
 	if event.item.name == "raw-fish" then
 		local player = game.players[event.player_index]				
-		hunger_update(player, player_hunger_fish_food_value)		
+		hunger_update(player, config.player_hunger_fish_food_value)		
 		player.play_sound{path="utility/armor_insert", volume_modifier=1}		
-		refresh_gui()
+		gui.refresh_gui()
 	end
 end
 
 Event.add(defines.events.on_player_used_capsule, on_player_used_capsule)
-Event.add(defines.events.on_gui_click, on_gui_click)
 Event.add(defines.events.on_research_finished, on_research_finished)
 Event.add(defines.events.on_player_respawned, on_player_respawned)
 Event.add(defines.events.on_player_mined_entity, on_player_mined_entity)
