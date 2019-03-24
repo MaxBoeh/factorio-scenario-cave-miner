@@ -299,11 +299,6 @@ local function on_chunk_generated(event)
 	local pos_y = 0
 	local tile_distance_to_center = 0			
 	local entities = surface.find_entities(event.area)
-	for _, e in pairs(entities) do
-		if e.type == "resource" or e.type == "tree" or e.force.name == "enemy" then
-			e.destroy()				
-		end
-	end	
 	local noise_seed_add = 25000
 	local current_noise_seed_add = noise_seed_add	
 	local m1 = 0.13
@@ -312,6 +307,14 @@ local function on_chunk_generated(event)
 	
 	local tree_size = game.surfaces[1].map_gen_settings.autoplace_controls.trees.size -- value 0 - 6
 	local tree_threshold = (1 - (tree_size / 6)) * 0.5
+	
+	
+	for _, e in pairs(entities) do
+		if e.type == "resource" or e.type == "tree" or e.force.name == "enemy" then
+			e.destroy()				
+		end
+	end
+	
 	
 	for x = 0, 31, 1 do
 		for y = 0, 31, 1 do			
@@ -456,7 +459,7 @@ local function on_chunk_generated(event)
 				else
 					tile_to_insert = "grass-1"
 					
-					if cave_noise_3 > tree_threshold and tile_distance_to_center + 3000 < global.spawn_dome_size then
+					if cave_noise_3 > tree_threshold and tile_distance_to_center + 750 < global.spawn_dome_size then
 						table.insert(spawn_tree_positions, {pos_x,pos_y})
 					end
 				end

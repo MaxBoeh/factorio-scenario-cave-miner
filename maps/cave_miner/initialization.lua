@@ -24,21 +24,7 @@ local function init_scenario()
 	
 	game.map_settings.enemy_evolution.destroy_factor = 0.004
 	
-	global.cave_miner_map_info = [[
-Delve deep for greater treasures, but also face increased dangers.
-Mining productivity research, will overhaul your mining equipment,
-reinforcing your pickaxe as well as increasing the size of your backpack.
-
-Breaking rocks is exhausting and might make you hungry.
-So don´t forget to eat some fish once in a while to stay well fed.
-But be careful, eating too much might have it´s consequences too.
-
-As you dig, you will encounter black bedrock that is just too solid for your pickaxe.
-Some explosives could even break through the impassable dark rock.
-All they need is a container and a well aimed shot.
-
-Darkness is a hazard in the mines, stay near your lamps...
-]]
+	global.cave_miner_map_info = config.map_info
 	global.player_hunger = {}
 					
 	global.damaged_rocks = {}

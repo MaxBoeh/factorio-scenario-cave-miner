@@ -42,6 +42,22 @@ return {
     player_hunger_color_list = player_hunger_color_list,
     player_hunger_buff = player_hunger_buff,
 
+	map_info = [[
+Delve deep for greater treasures, but also face increased dangers.
+Mining productivity research, will overhaul your mining equipment,
+reinforcing your pickaxe as well as increasing the size of your backpack.
+
+Breaking rocks is exhausting and might make you hungry.
+So don´t forget to eat some fish once in a while to stay well fed.
+But be careful, eating too much might have it´s consequences too.
+
+As you dig, you will encounter black bedrock that is just too solid for your pickaxe.
+Some explosives could even break through the impassable dark rock.
+All they need is a container and a well aimed shot.
+
+Darkness is a hazard in the mines, stay near your lamps...
+]],
+	
     darkness_messages = {
         "Something is lurking in the dark...",
         "A shadow moves. I doubt it is friendly...",
