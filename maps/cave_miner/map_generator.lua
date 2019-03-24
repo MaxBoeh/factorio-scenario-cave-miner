@@ -279,8 +279,7 @@ local function secret_shop(pos)
 	end
 end
 
-local function on_chunk_generated(event)
-	if not global.noise_seed then global.noise_seed = math.random(1,5000000) end	
+local function on_chunk_generated(event)	
 	local surface = game.surfaces[1]	
 	local noise = {}
 	local tiles = {}	

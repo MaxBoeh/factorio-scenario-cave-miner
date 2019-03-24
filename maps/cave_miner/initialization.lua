@@ -45,7 +45,11 @@ Darkness is a hazard in the mines, stay near your lamps...
 	
 	global.rock_density = 62  ---- insert value up to 100
 	global.rock_raffle = {"sand-rock-big","sand-rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-huge"}
-
+	
+	-- generate noice seed based on the map seed
+	seed_random = game.create_random_generator()
+	global.noise_seed = seed_random(1,5000000)
+	
 	-- starting area is based on the starting area size setting.
 	global.spawn_dome_size = 20000 * gen_settings.starting_area;
 	
