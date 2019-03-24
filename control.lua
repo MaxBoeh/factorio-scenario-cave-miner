@@ -33,7 +33,6 @@ local function player_created(event)
 	player.gui.top.style = 'slot_table_spacing_horizontal_flow'
 	player.gui.left.style = 'slot_table_spacing_vertical_flow'
 	
---	player.print("***Welcome to DE333-SERVER.EU***", {r = 255, g = 0, b = 0})
 	player.print("map by MewMew", {r = 255, g = 0, b = 0})
 end
 
