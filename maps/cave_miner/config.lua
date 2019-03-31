@@ -75,6 +75,29 @@ Darkness is a hazard in the mines, stay near your lamps...
 
     generator = {
         shop_block_range = 125,
-        infinity_chest_block_range = 40
+        infinity_chest_block_range = 40,
+        infinity_chest_raffle_config = {
+            -- a list with all possible chest contents will be created from this config (raffle table)
+            -- _weight_: how many times this line will be added to the raffle table
+            -- Every N _ticks_ items in the chest will be filled up to _amount_
+            { weight = 10, amount = 4, ticks = 10, name = "wood" },
+            { weight = 8, amount = 4, ticks = 10, name = "uranium-ore" },
+            { weight = 8, amount = 4, ticks = 10, name = "iron-ore" },
+            { weight = 8, amount = 4, ticks = 10, name = "copper-ore" },
+            { weight = 5, amount = 4, ticks = 10, name = "iron" },
+            { weight = 5, amount = 4, ticks = 10, name = "copper" },
+            { weight = 3, amount = 2, ticks = 10, name = "steel-plate" },
+
+            { weight = 4, amount = 2, ticks = 10, name = "electronic-circuit" },
+            { weight = 1, amount = 2, ticks = 10, name = "advanced-circuit" },
+            { weight = 1, amount = 2, ticks = 10, name = "processing-unit" },
+
+            { weight = 1, amount = 2, ticks = 10, name = "automation-science-pack" }, -- red
+            { weight = 1, amount = 2, ticks = 10, name = "logistic-science-pack" }, -- green
+            { weight = 1, amount = 1, ticks = 15, name = "military-science-pack" }, -- black
+            { weight = 1, amount = 1, ticks = 15, name = "chemical-science-pack" }, -- blue
+            { weight = 1, amount = 1, ticks = 20, name = "production-science-pack" }, -- purple
+            { weight = 1, amount = 1, ticks = 20, name = "utility-science-pack" }, -- yellow
+        }
     }
 }

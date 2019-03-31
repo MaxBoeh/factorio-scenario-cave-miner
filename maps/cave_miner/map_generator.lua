@@ -18,16 +18,7 @@ local worm_raffle_table = {
 }
 
 local infinity_chest_raffle = {}
-local infinity_chest_raffle_config = {
-    { weight = 10, amount = 4, ticks = 10, name = "wood" },
-    { weight = 8, amount = 4, ticks = 10, name = "uranium-ore" },
-    { weight = 8, amount = 4, ticks = 10, name = "iron-ore" },
-    { weight = 8, amount = 4, ticks = 10, name = "copper-ore" },
-    { weight = 3, amount = 2, ticks = 10, name = "steel-plate" },
-    { weight = 4, amount = 2, ticks = 10, name = "electronic-circuit" },
-    { weight = 1, amount = 2, ticks = 10, name = "advanced-circuit" },
-    { weight = 1, amount = 2, ticks = 10, name = "processing-unit" }
-}
+local infinity_chest_raffle_config = config.generator.infinity_chest_raffle_config
 
 local function shuffle(tbl)
 	local size = #tbl
@@ -47,7 +38,7 @@ local function get_infinity_chest_raffle()
         end
         infinity_chest_raffle = shuffle(infinity_chest_raffle)
     end
-    return infinity_chest_raffle;
+    return infinity_chest_raffle
 end
 
 local function treasure_chest(position, distance_to_center)	
