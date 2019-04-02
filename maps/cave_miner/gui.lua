@@ -2,8 +2,6 @@
 local Event = require 'utils.event' 
 local config = require "maps.cave_miner.config"
 
-local ui_dirty = false
-
 local function create_cave_miner_button(player)
 	if player.gui.top["caver_miner_stats_toggle_button"] then player.gui.top["caver_miner_stats_toggle_button"].destroy() end	
 	local b = player.gui.top.add({ type = "sprite-button", name = "caver_miner_stats_toggle_button", sprite = "item/iron-ore" })
@@ -15,7 +13,10 @@ local function create_cave_miner_button(player)
 	b.style.bottom_padding = 2
 end
 
-local function create_cave_miner_info(player)	
+local function create_cave_miner_info(player)
+	if player.gui.left["cave_miner_info"] then
+		player.gui.left["cave_miner_info"].destroy()
+	end	
 	local frame = player.gui.left.add {type = "frame", name = "cave_miner_info", direction = "vertical"}
 	local t = frame.add {type = "table", column_count = 1}	
 	
@@ -151,38 +152,47 @@ local function on_gui_click(event)
 end
 
 local function refresh_gui()
-	for _, player in pairs(game.connected_players) do
-		local frame = player.gui.top["caver_miner_stats_frame"]
-		if (frame) then			
-			create_cave_miner_button(player)
-            create_effiency_gui(player)
-			create_cave_miner_stats_gui(player)					
+	if game.tick % 60 == 0 then
+		for _, player in pairs(game.connected_players) do
+			if global.player_based_data[player.index] == nil then
+				global.player_based_data[player.index] = { ui_dirty = true }
+			end
+			if global.player_based_data[player.index].ui_dirty then
+				local frame = player.gui.top["caver_miner_stats_frame"]
+				log("gui.refresh_gui for player " .. player.index)
+				if (frame) then			
+					create_cave_miner_button(player)
+					create_effiency_gui(player)
+					create_cave_miner_stats_gui(player)					
+				end
+				global.player_based_data[player.index].ui_dirty = false
+			end
 		end
 	end
 end
 
 local function on_player_joined_game(event)
-    ui_dirty = true
-    local player = game.players[event.player_index]
+	log("gui.on_player_joined_game " .. event.player_index)
+	local player = game.players[event.player_index]
     create_cave_miner_info(player)
 	create_cave_miner_button(player)
+	create_cave_miner_stats_gui(player)
 end
 
 local function on_tick(event)
-    if ui_dirty then
-        refresh_gui()
-        ui_dirty = false
-    end
+	refresh_gui()
+end
+
+local function init()
+	Event.add(defines.events.on_player_joined_game, on_player_joined_game)
+	Event.add(defines.events.on_gui_click, on_gui_click)
+	Event.add(defines.events.on_tick, on_tick)
 end
 
 
-Event.add(defines.events.on_player_joined_game, on_player_joined_game)
-Event.add(defines.events.on_gui_click, on_gui_click)
-Event.add(defines.events.on_tick, on_tick)
-
-
 return {
-    refresh_gui = function() ui_dirty = true end,
-    create_cave_miner_stats_gui = create_cave_miner_stats_gui
+	init = init,
+    refresh_gui = function(player) global.player_based_data[player.index].ui_dirty = true end,
+	create_cave_miner_stats_gui = create_cave_miner_stats_gui
 }
 

@@ -18,7 +18,7 @@ local worm_raffle_table = {
 }
 
 local infinity_chest_raffle = {}
-local infinity_chest_raffle_config = config.generator.infinity_chest_raffle_config
+local infinity_chest_raffle_config = config.map.infinity_chest_raffle_config
 
 local function shuffle(tbl)
 	local size = #tbl
@@ -309,7 +309,7 @@ local function infinity_chest(position)
         chest,
         chest_config.name,
         chest_config.amount,
-        chest_config.ticks
+        chest_config.seconds
     )
 end
 
@@ -586,7 +586,7 @@ local function on_chunk_generated(event)
 		end
 	end
         
-    local shop_block_range = config.generator.shop_block_range
+    local shop_block_range = config.map.shop_block_range
 	for _, p in pairs(secret_shop_locations) do	
 		if math.random(1,10)==1 then
             local shop_filter = {
@@ -603,7 +603,7 @@ local function on_chunk_generated(event)
 		end
 	end	
 
-    local infinity_chest_block_range = config.generator.infinity_chest_block_range
+    local infinity_chest_block_range = config.map.infinity_chest_block_range
 	for _, p in pairs(infinity_chest_locations) do	
 		if math.random(1,10)==1 then
             local chest_filter = {

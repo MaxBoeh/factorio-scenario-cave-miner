@@ -80,13 +80,12 @@ local function hunger_update(player, food_value)
 end
 
 local function on_player_joined_game(event)
+	log("main.on_player_joined_game")
 	local player = game.players[event.player_index]
 
 	global.player_hunger[player.name] = config.player_hunger_spawn_value
 	hunger_update(player, 0)
-	gui.refresh_gui()
-
-	gui.create_cave_miner_stats_gui(player)
+	gui.refresh_gui(player)
 end
 
 local function spawn_cave_inhabitant(pos, target_position)
@@ -162,9 +161,11 @@ local function on_tick(event)
 	
 	if game.tick % 5400 == 2700 then
 		for _, player in pairs(game.connected_players) do
-			if player.afk_time < 18000 then	hunger_update(player, -1) end		
+			if player.afk_time < 18000 then	
+				hunger_update(player, -1)
+				gui.refresh_gui(player.index)
+			end
 		end
-		gui.refresh_gui()
 	end
 	
 	if game.tick == 30 then
@@ -260,7 +261,7 @@ local function pre_player_mined_item(event)
 		end
 		
 		global.stats_rocks_broken = global.stats_rocks_broken + 1		
-		gui.refresh_gui()
+		gui.refresh_gui(event.player_index)
 		
 		if math.random(1,32) == 1 then				
 			local p = {x = rock_position.x, y = rock_position.y}
@@ -366,13 +367,13 @@ local function on_player_respawned(event)
 	player.character.disable_flashlight()
 	global.player_hunger[player.name] = config.player_hunger_spawn_value
 	hunger_update(player, 0)
-	gui.refresh_gui()
+	gui.refresh_gui(player.index)
 end
 
 local function on_research_finished(event)
 	game.forces.player.manual_mining_speed_modifier = game.forces.player.mining_drill_productivity_bonus * 6
 	game.forces.player.character_inventory_slots_bonus = game.forces.player.mining_drill_productivity_bonus * 500
-	gui.refresh_gui()
+	gui.refresh_gui(event.player_index)
 end
 
 local function on_player_used_capsule(event)
@@ -380,7 +381,7 @@ local function on_player_used_capsule(event)
 		local player = game.players[event.player_index]				
 		hunger_update(player, config.player_hunger_fish_food_value)		
 		player.play_sound{path="utility/armor_insert", volume_modifier=1}		
-		gui.refresh_gui()
+		gui.refresh_gui(event.player_index)
 	end
 end
 

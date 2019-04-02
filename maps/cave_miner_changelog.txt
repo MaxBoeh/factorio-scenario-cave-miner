@@ -1,4 +1,4 @@
-0.22 (not released yet)
+(not released yet) 0.22 - forked by MaxBoeh at https://github.com/MaxBoeh/factorio-scenario-cave-miner
 migrated to factorio version 0.17
 the configurable map generation settings are now used for trees ("size") and starting area size
 cave generation is now based on map seed

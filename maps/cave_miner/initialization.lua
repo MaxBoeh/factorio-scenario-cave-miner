@@ -1,8 +1,7 @@
 
 local Event = require 'utils.event' 
 local config = require "maps.cave_miner.config"
-
-local scenario_init_done = false
+local gui = require "maps.cave_miner.gui"
 
 local function init_scenario()
     
@@ -26,6 +25,7 @@ local function init_scenario()
 	
 	global.cave_miner_map_info = config.map_info
 	global.player_hunger = {}
+	global.player_based_data = {}
 					
 	global.damaged_rocks = {}
 	
@@ -33,7 +33,7 @@ local function init_scenario()
 	global.rock_raffle = {"sand-rock-big","sand-rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-big","rock-huge"}
 	
 	-- generate noice seed based on the map seed
-	seed_random = game.create_random_generator()
+	local seed_random = game.create_random_generator()
 	global.noise_seed = seed_random(1,5000000)
 	
 	-- starting area is based on the starting area size setting.
@@ -60,7 +60,9 @@ local function init_scenario()
 
 	global.darkness_threat_level = {}							
 	
-	scenario_init_done = true	
+	gui.init()
+
+	global.scenario_init_done = true	
 end
 
 local function init_player(player)
@@ -72,10 +74,12 @@ local function init_player(player)
 		player.insert {name = 'coin', count = 10}
 		player.insert {name = 'raw-fish', count = 50}
 	end 
+	
+	global.player_based_data[player.index] = {}
 end
 
 local function on_player_joined_game(event)
-	if scenario_init_done == false then
+	if global.scenario_init_done == false or global.scenario_init_done == nil then
 		init_scenario()
 	end
 

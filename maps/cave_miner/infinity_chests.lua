@@ -1,18 +1,14 @@
-
-
 local Event = require 'utils.event' 
 local config = require "maps.cave_miner.config"
 
-local chests = {}
+global.infinity_chests = {}
 
-local prototype_name = "cave-miner_infinity-chest"
-
-local function add_chest(chest_entity, item_name, amount, ticks)
-    table.insert(chests, {
+local function add_chest(chest_entity, item_name, amount, seconds)
+    table.insert(global.infinity_chests, {
         entity = chest_entity,
         item_name = item_name,
         amount = amount,
-        ticks = ticks
+        seconds = seconds
     })
 end
 
@@ -31,9 +27,9 @@ end
 
 local function on_tick(event)
     if game.tick % 60 == 0 then
-        for index=1,#chests,1 do
-            local chest_config = chests[index]
-            if game.tick % chest_config.ticks == 0 then
+        for index=1,#global.infinity_chests,1 do
+            local chest_config = global.infinity_chests[index]
+            if game.tick % chest_config.seconds == 0 then
                 ensure_chest_content(chest_config)
             end
         end

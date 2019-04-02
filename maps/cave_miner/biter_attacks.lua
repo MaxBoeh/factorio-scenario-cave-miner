@@ -1,9 +1,10 @@
 
 local Event = require 'utils.event' 
 
-local biter_spawn_amount_raffle = {}
-local biter_spawn_schedule = {}
-
+global.biter_attacks = {
+	biter_spawn_amount_raffle = {},
+	biter_spawn_schedule = {}
+}
 
 local function get_biter_spawn_amount_raffle()
     local biter_spawn_amount_weights = {}				
@@ -22,7 +23,7 @@ local function get_biter_spawn_amount_raffle()
     end
     return biter_spawn_amount_raffle
 end
-biter_spawn_amount_raffle = get_biter_spawn_amount_raffle()
+global.biter_attacks.biter_spawn_amount_raffle = get_biter_spawn_amount_raffle()
 
 local function find_first_entity_spiral_scan(pos, entities, range)
 	if not pos then return end
@@ -71,6 +72,8 @@ local function biter_attack_event()
 	end
 	if valid_positions[1] then
 		if #valid_positions == 1 then
+			local biter_spawn_amount_raffle = global.biter_attacks.biter_spawn_amount_raffle
+			local biter_spawn_schedule = global.biter_attacks.biter_spawn_schedule
 			for x = 1, biter_spawn_amount_raffle[math.random(1,#biter_spawn_amount_raffle)],1 do
 				table.insert(biter_spawn_schedule, {game.tick + 20*x, valid_positions[1]})
 			end
@@ -88,6 +91,7 @@ end
 
 local function on_tick(event)
 	if game.tick % 30 == 0 then
+		local biter_spawn_schedule = global.biter_attacks.biter_spawn_schedule
 		if biter_spawn_schedule then
 			for x = 1, #biter_spawn_schedule, 1 do
 				if biter_spawn_schedule[x] then
@@ -114,7 +118,7 @@ end
     position {x,y}
 ]]--
 function add_biter_spawn(gameTick, position)
-    table.insert(biter_spawn_schedule, {gameTick, position})
+    table.insert(global.biter_attacks.biter_spawn_schedule, {gameTick, position})
 end
 
 
