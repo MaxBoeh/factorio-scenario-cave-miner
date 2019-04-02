@@ -1,6 +1,7 @@
 
 local Event = require 'utils.event' 
 local config = require "maps.cave_miner.config"
+local debug = require "maps.tools.debug"
 
 local function create_cave_miner_button(player)
 	if player.gui.top["caver_miner_stats_toggle_button"] then player.gui.top["caver_miner_stats_toggle_button"].destroy() end	
@@ -159,7 +160,7 @@ local function refresh_gui()
 			end
 			if global.player_based_data[player.index].ui_dirty then
 				local frame = player.gui.top["caver_miner_stats_frame"]
-				log("gui.refresh_gui for player " .. player.index)
+				debug.log("gui.refresh_gui for player " .. player.index)
 				if (frame) then			
 					create_cave_miner_button(player)
 					create_effiency_gui(player)
@@ -172,7 +173,7 @@ local function refresh_gui()
 end
 
 local function on_player_joined_game(event)
-	log("gui.on_player_joined_game " .. event.player_index)
+	debug.log("gui.on_player_joined_game " .. event.player_index)
 	local player = game.players[event.player_index]
     create_cave_miner_info(player)
 	create_cave_miner_button(player)
@@ -189,10 +190,18 @@ local function init()
 	Event.add(defines.events.on_tick, on_tick)
 end
 
+function mark_player_gui_dirty(playerIndex)
+	if playerIndex == nil then
+		log("gui.mark_player_gui_dirty: missing argument playerIndex")
+	else
+		global.player_based_data[playerIndex].ui_dirty = true
+	end
+end
+
 
 return {
 	init = init,
-    refresh_gui = function(player) global.player_based_data[player.index].ui_dirty = true end,
+    refresh_gui = mark_player_gui_dirty,
 	create_cave_miner_stats_gui = create_cave_miner_stats_gui
 }
 

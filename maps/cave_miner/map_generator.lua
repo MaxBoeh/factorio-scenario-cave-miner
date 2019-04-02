@@ -2,23 +2,24 @@
 local Event = require 'utils.event' 
 local simplex_noise = require 'utils.simplex_noise'
 local config = require 'maps.cave_miner.config'
+local debug = require 'maps.tools.debug'
 local infinity_chests = require 'maps.cave_miner.infinity_chests'
 
-local worm_raffle_table = {
-    [1] = {"small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret"},
-    [2] = {"small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret", "medium-worm-turret"},
-    [3] = {"small-worm-turret", "small-worm-turret", "small-worm-turret", "medium-worm-turret", "medium-worm-turret"},
-    [4] = {"small-worm-turret", "small-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret"},
-    [5] = {"small-worm-turret", "small-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret"},
-    [6] = {"small-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret"},
-    [7] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret"},
-    [8] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret"},
-    [9] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret", "big-worm-turret"},
-    [10] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret", "big-worm-turret"}
+global.map_generator = {
+	infinity_chest_raffle = {},
+	worm_raffle_table = {
+		[1] = {"small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret"},
+		[2] = {"small-worm-turret", "small-worm-turret", "small-worm-turret", "small-worm-turret", "medium-worm-turret"},
+		[3] = {"small-worm-turret", "small-worm-turret", "small-worm-turret", "medium-worm-turret", "medium-worm-turret"},
+		[4] = {"small-worm-turret", "small-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret"},
+		[5] = {"small-worm-turret", "small-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret"},
+		[6] = {"small-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret"},
+		[7] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret"},
+		[8] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret"},
+		[9] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret", "big-worm-turret"},
+		[10] = {"medium-worm-turret", "medium-worm-turret", "medium-worm-turret", "big-worm-turret", "big-worm-turret", "big-worm-turret"}
+	}
 }
-
-local infinity_chest_raffle = {}
-local infinity_chest_raffle_config = config.map.infinity_chest_raffle_config
 
 local function shuffle(tbl)
 	local size = #tbl
@@ -30,8 +31,9 @@ local function shuffle(tbl)
 end
 
 local function get_infinity_chest_raffle()
+	local infinity_chest_raffle = global.map_generator.infinity_chest_raffle
     if #infinity_chest_raffle == 0 then
-        for _,chest_config in pairs(infinity_chest_raffle_config) do
+        for _,chest_config in pairs(config.map.infinity_chest_raffle_config) do
             for i=0,chest_config.weight,1 do
                 table.insert(infinity_chest_raffle, chest_config)
             end
@@ -314,6 +316,7 @@ local function infinity_chest(position)
 end
 
 local function on_chunk_generated(event)	
+	debug.log("map_generator.on_chunk_generated:start")
 	local surface = game.surfaces[1]	
 	local noise = {}
 	local tiles = {}	
@@ -342,7 +345,8 @@ local function on_chunk_generated(event)
 	
 	local tree_size = game.surfaces[1].map_gen_settings.autoplace_controls.trees.size -- value 0 - 6
 	local tree_threshold = (1 - (tree_size / 6)) * 0.5
-	
+
+	local worm_raffle_table = global.map_generator.worm_raffle_table
 	
 	for _, e in pairs(entities) do
 		if e.type == "resource" or e.type == "tree" or e.force.name == "enemy" then
@@ -350,9 +354,10 @@ local function on_chunk_generated(event)
 		end
 	end
 	
+	debug.log("map_generator.on_chunk_generated:chunk resetted")
 	
 	for x = 0, 31, 1 do
-		for y = 0, 31, 1 do			
+		for y = 0, 31, 1 do
 			pos_x = event.area.left_top.x + x
 			pos_y = event.area.left_top.y + y
 			tile_distance_to_center = pos_x^2 + pos_y^2
@@ -390,7 +395,7 @@ local function on_chunk_generated(event)
 			current_noise_seed_add = noise_seed_add	
 			
 			tile_to_insert = false	
-			if tile_distance_to_center > global.spawn_dome_size then												
+			if tile_distance_to_center > global.spawn_dome_size then
 			
 				if tile_distance_to_center > (global.spawn_dome_size + 5000) * (cave_noise_3 * 0.05 + 1.1) then
 					if cave_noise > 1 then
@@ -417,7 +422,7 @@ local function on_chunk_generated(event)
 									if cave_noise < 0.79 then table.insert(rock_positions, {pos_x,pos_y}) end
 								end
 							end
-						end	
+						end
 						if cave_noise < -0.80 then
 							tile_to_insert = "dirt-6"
 							if noise[3] > 0.18 or noise[3] < -0.18 then
@@ -494,25 +499,30 @@ local function on_chunk_generated(event)
 					table.insert(fish_positions, {pos_x,pos_y})
 				else
 					tile_to_insert = "grass-1"
-					
+
 					if cave_noise_3 > tree_threshold and tile_distance_to_center + 750 < global.spawn_dome_size then
 						table.insert(spawn_tree_positions, {pos_x,pos_y})
 					end
 				end
 			end
 			
-			if tile_distance_to_center < global.spawn_dome_size and tile_distance_to_center > global.spawn_dome_size - 500 and tile_to_insert == "grass-1" then
+			if
+				tile_distance_to_center < global.spawn_dome_size
+				and tile_distance_to_center > global.spawn_dome_size - 500
+				and tile_to_insert == "grass-1"
+			then
 				table.insert(rock_positions, {pos_x,pos_y})	
 			end						
 			
 			if tile_to_insert == false then
-				table.insert(tiles, {name = "out-of-map", position = {pos_x,pos_y}}) 
-			else
-				table.insert(tiles, {name = tile_to_insert, position = {pos_x,pos_y}}) 
-			end					
+				tile_to_insert = "out-of-map"
+			end
+			table.insert(tiles, {name = tile_to_insert, position = {pos_x,pos_y}}) 
 		end							
 	end
+	debug.log("map_generator.on_chunk_generated:loops")
 	surface.set_tiles(tiles,true)
+	debug.log("map_generator.on_chunk_generated:tiles set")
 		
 	for _, k in pairs(treasure_chest_positions) do	
 		if math.random(1,800)==1 then 
@@ -550,7 +560,7 @@ local function on_chunk_generated(event)
 				end
 			end			
 		end
-	end	
+	end
 	
 	for _, p in pairs(enemy_worm_positions) do		
 		if math.random(1,300)==1 then
@@ -563,7 +573,7 @@ local function on_chunk_generated(event)
 				surface.create_entity {name=entity_name, position=p}
 			end
 		end
-	end	
+	end
 	
 	for _, p in pairs(enemy_can_place_worm_positions) do		
 		if math.random(1,30)==1 then
@@ -601,7 +611,7 @@ local function on_chunk_generated(event)
 				secret_shop(p)
 			end
 		end
-	end	
+	end
 
     local infinity_chest_block_range = config.map.infinity_chest_block_range
 	for _, p in pairs(infinity_chest_locations) do	
@@ -619,7 +629,7 @@ local function on_chunk_generated(event)
 				infinity_chest(p)
 			end
 		end
-	end		
+	end
 	
 	for _, p in pairs(spawn_tree_positions) do	
 		if math.random(1,6)==1 then 
@@ -631,7 +641,7 @@ local function on_chunk_generated(event)
 		if math.random(1,20)==1 then 
 			surface.create_entity {name="tree-02",position=p}
 		end
-	end				
+	end
 	
 	local decorative_names = {}
 	for k,v in pairs(game.decorative_prototypes) do
@@ -640,6 +650,7 @@ local function on_chunk_generated(event)
 		end
 	 end	 
 	surface.regenerate_decorative(decorative_names, {{x=math.floor(event.area.left_top.x/32),y=math.floor(event.area.left_top.y/32)}})		
+	debug.log("map_generator.on_chunk_generated:done")
 end
 
 

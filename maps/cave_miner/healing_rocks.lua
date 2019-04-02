@@ -1,10 +1,7 @@
-local healing_amount = {
-	["rock-big"] = 4,
-	["sand-rock-big"] = 4,
-	["rock-huge"] = 16
-}
+local config = require "maps.cave_miner.config"
 
 local function heal_rocks()
+	local healing_amount = config.rock_healing
 	for key, rock in pairs(global.damaged_rocks) do
 		if rock.last_damage + 300 < game.tick then
 			if rock.entity.valid then

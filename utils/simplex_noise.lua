@@ -29,6 +29,8 @@ for i=0,511 do
 	perm[i+1] = p[bit32.band(i, 255) + 1]
 end
 
+local sqrtOfThree = math.sqrt(3.0)
+
 local function dot(g, ...)
 	local v = {...}
 	local sum = 0
@@ -43,11 +45,11 @@ function Simplex.d2(xin, yin,seed)
 	yin = yin + seed
 	local n0, n1, n2	-- Noise contributions from the three corners
 	-- Skew the input space to determine which simplex cell we're in
-	local F2 = 0.5*(math.sqrt(3.0)-1.0)
+	local F2 = 0.5*(sqrtOfThree-1.0)
 	local s = (xin+yin)*F2; -- Hairy factor for 2D
 	local i = math.floor(xin+s)
 	local j = math.floor(yin+s)
-	local G2 = (3.0-math.sqrt(3.0))/6.0
+	local G2 = (3.0-sqrtOfThree)/6.0
 	local t = (i+j)*G2
 	local X0 = i-t -- Unskew the cell origin back to (x,y) space
 	local Y0 = j-t

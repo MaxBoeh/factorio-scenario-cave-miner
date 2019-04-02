@@ -10,9 +10,12 @@ require "maps.tools.map_pregen"
 
 local biter_attacks = require "maps.cave_miner.biter_attacks"
 local config = require "maps.cave_miner.config"
+local debug = require "maps.tools.debug"
 local gui = require "maps.cave_miner.gui"
 local map_generator = require "maps.cave_miner.map_generator"
 local market_items = require "maps.cave_miner.market_items"
+
+-- debug.enable()
 
 local rock_inhabitants = {
 	[1] = {"small-biter"},
@@ -80,12 +83,12 @@ local function hunger_update(player, food_value)
 end
 
 local function on_player_joined_game(event)
-	log("main.on_player_joined_game")
+	debug.log("main.on_player_joined_game")
 	local player = game.players[event.player_index]
 
 	global.player_hunger[player.name] = config.player_hunger_spawn_value
 	hunger_update(player, 0)
-	gui.refresh_gui(player)
+	gui.refresh_gui(player.index)
 end
 
 local function spawn_cave_inhabitant(pos, target_position)

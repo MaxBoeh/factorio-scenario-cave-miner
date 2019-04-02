@@ -105,5 +105,11 @@ Darkness is a hazard in the mines, stay near your lamps...
             { weight = 1, amount = 1, seconds = 40, name = "production-science-pack" }, -- purple
             { weight = 1, amount = 1, seconds = 50, name = "utility-science-pack" }, -- yellow
         }
+    },
+
+    rock_healing = {
+        ["rock-big"] = 4,
+        ["sand-rock-big"] = 4,
+        ["rock-huge"] = 16
     }
 }
